@@ -8,7 +8,8 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 try:
     from gatet import Tele
     from gatet1 import Tele as Tele1  # gatet1.py အတွက် import အသစ်
-    from gatet2 import Tele as Tele2  # gatet1.py အတွက် import အသစ်
+    from gatet2 import Tele as Tele2  # gatet2.py အတွက် import အသစ်
+    from gatet3 import Tele as Tele3  # gatet3.py အတွက် import အသစ်
     from hit_sender import send
 except ImportError as e:
     print(f"Error: ဖိုင်တစ်ခုခု လိုအပ်နေသည် - {e}")
@@ -49,6 +50,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/au - Gateway 1 နဲ့စစ်မယ် (1 Credit)\n"
         "/ad - Gateway 2 နဲ့စစ်မယ် (1 Credit)\n"
         "/az - Gateway 3 နဲ့စစ်မယ် (1 Credit)\n"
+        "/pw - Gateway 4 နဲ့စစ်မယ် (1 Credit)\n"
         "/help - အကူအညီတောင်းမယ်\n\n"
         "ဆက်သွယ်ရန် - @strawhatchannel69"
     )
@@ -110,7 +112,7 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
     try:
         # Gateway logic
         last = str(gate_func(cc))
-        if "Successfully" in last or "Thanks" in last or "thank" in last:
+        if "Successfully" in last or "Thanks" in last or "thank" in last or "success" in last:
             last = "Charged 💥"
         
         time_taken = round(time.time() - start_time, 2)
@@ -141,6 +143,9 @@ async def ad_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def az_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await process_card_check(update, context, Tele2) # gatet2.py ကိုသုံးမယ်
+    
+async def pw_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await process_card_check(update, context, Tele3) # gatet3.py ကိုသုံးမယ်
 
 # Admin Command
 async def add_credit(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -167,6 +172,7 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("au", au_check))   # Gateway 1
     app.add_handler(CommandHandler("ad", ad_check))   # Gateway 2 (အသစ်)
     app.add_handler(CommandHandler("az", az_check))   # Gateway 3 (အသစ်)
+    app.add_handler(CommandHandler("pw", pw_check))   # Gateway 3 (အသစ်)
     app.add_handler(CommandHandler("add", add_credit))
     
     print("Bot is running with Credit System & Dual Gateway...")
