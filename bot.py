@@ -7,9 +7,9 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 # --- အရေးကြီးသွင်းကုန်များ ---
 try:
     from gatet import Tele
-    from gatet1 import Tele as Tele1  # gatet1.py အတွက် import အသစ်
-    from gatet2 import Tele as Tele2  # gatet2.py အတွက် import အသစ်
-    from gatet3 import Tele as Tele3  # gatet3.py အတွက် import အသစ်
+    from gatet1 import Tele as Tele1
+    from gatet2 import Tele as Tele2
+    from gatet3 import Tele as Tele3
     from hit_sender import send
 except ImportError as e:
     print(f"Error: ဖိုင်တစ်ခုခု လိုအပ်နေသည် - {e}")
@@ -27,19 +27,64 @@ logging.basicConfig(
 def init_db():
     conn = sqlite3.connect('bot_database.db')
     cursor = conn.cursor()
+    # User Table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY,
             credits INTEGER DEFAULT 0
         )
     ''')
+    # Gateway Status Table (Gate တွေ ပိတ်/ဖွင့် သိမ်းရန်)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS gate_status (
+            gate_name TEXT PRIMARY KEY,
+            is_active INTEGER DEFAULT 1
+        )
+    ''')
+    # အစပိုင်းမှာ Gate အားလုံးကို ON (1) ထားမယ်
+    gates = [('au',), ('ad',), ('az',), ('ak',)]
+    cursor.executemany('INSERT OR IGNORE INTO gate_status (gate_name) VALUES (?)', gates)
+    
     conn.commit()
     conn.close()
 
 def get_db_connection():
     return sqlite3.connect('bot_database.db')
 
+def is_gate_on(gate_name):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT is_active FROM gate_status WHERE gate_name = ?", (gate_name,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] == 1 if result else False
+
 # --- BOT COMMANDS ---
+
+# Admin က Gate ကို ပိတ်/ဖွင့် လုပ်ရန်
+# Usage: /gate au off သို့မဟုတ် /gate au on
+async def control_gate(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID: return
+    
+    try:
+        gate_name = context.args[0].lower()
+        action = context.args[1].lower()
+        
+        status = 1 if action == "on" else 0
+        status_text = "ဖွင့်" if status == 1 else "ပိတ်"
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE gate_status SET is_active = ? WHERE gate_name = ?", (status, gate_name))
+        conn.commit()
+        
+        if cursor.rowcount > 0:
+            await update.message.reply_text(f"✅ Gateway **{gate_name}** ကို {status_text}လိုက်ပါပြီ။")
+        else:
+            await update.message.reply_text("❌ Gateway အမည် မှားနေပါသည်။")
+        conn.close()
+    except:
+        await update.message.reply_text("Usage: `/gate [au/ad/az/ak] [on/off]`")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -50,8 +95,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/au - Gateway 1 နဲ့စစ်မယ် (1 Credit)\n"
         "/ad - Gateway 2 နဲ့စစ်မယ် (1 Credit)\n"
         "/az - Gateway 3 နဲ့စစ်မယ် (1 Credit)\n"
-        "/ak - Gateway 4 နဲ့စစ်မယ် (1 Credit)\n"
-        "/help - အကူအညီတောင်းမယ်\n\n"
+        "/ak - Gateway 4 နဲ့စစ်မယ် (1 Credit)\n\n"
         "ဆက်သွယ်ရန် - @strawhatchannel69"
     )
 
@@ -65,9 +109,9 @@ async def register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         cursor.execute("INSERT INTO users (user_id, credits) VALUES (?, ?)", (user_id, 10))
         conn.commit()
-        await update.message.reply_text("✅ Register အောင်မြင်ပါတယ်။ လက်ဆောင် 10 Credits ရရှိပါတယ်။")
+        await update.message.reply_text("✅ Register အောင်မြင်ပါသည်။")
     conn.close()
-
+    
 async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     conn = get_db_connection()
@@ -80,8 +124,13 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("⚠️ ကျေးဇူးပြု၍ အရင် /register လုပ်ပါ။")
 
-# --- Generic Check Logic (Internal Function) ---
-async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE, gate_func):
+# --- Generic Check Logic ---
+async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE, gate_func, gate_name):
+    # ၁။ Gate ပိတ်ထားလား အရင်စစ်မယ်
+    if not is_gate_on(gate_name):
+        await update.message.reply_text(f"❌ Gateway **{gate_name}** သည် လောလောဆယ် ပြုပြင်ထိန်းသိမ်းနေသောကြောင့် ခေတ္တပိတ်ထားပါသည်။")
+        return
+
     user_id = update.effective_user.id
     username = update.effective_user.username or "NoUsername"
     
@@ -106,18 +155,15 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
         return
 
     cc = context.args[0]
-    msg = await update.message.reply_text("Checking your card...")
+    msg = await update.message.reply_text(f"Checking on Gateway {gate_name.upper()}...")
     start_time = time.time()
 
     try:
-        # Gateway logic
         last = str(gate_func(cc))
-        if "Successfully" in last or "Thanks" in last or "thank" in last or "success" in last or "Thank" in last:
+        if any(x in last.lower() for x in ["Successfully", "Thanks", "thank", "success"]):
             last = "Charged 💥"
         
         time_taken = round(time.time() - start_time, 2)
-        
-        # Hit Sender
         send_response = send(cc, last, username, time_taken)
 
         # Credit လျှော့မယ်
@@ -134,18 +180,17 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
     conn.close()
 
 # --- Gateway Commands ---
-
 async def au_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await process_card_check(update, context, Tele) # gatet.py ကိုသုံးမယ်
+    await process_card_check(update, context, Tele, "au")
 
 async def ad_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await process_card_check(update, context, Tele1) # gatet1.py ကိုသုံးမယ်
+    await process_card_check(update, context, Tele1, "ad")
 
 async def az_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await process_card_check(update, context, Tele2) # gatet2.py ကိုသုံးမယ်
+    await process_card_check(update, context, Tele2, "az")
     
 async def ak_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await process_card_check(update, context, Tele3) # gatet3.py ကိုသုံးမယ်
+    await process_card_check(update, context, Tele3, "ak")
 
 # Admin Command
 async def add_credit(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -169,11 +214,14 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("register", register))
     app.add_handler(CommandHandler("balance", balance))
-    app.add_handler(CommandHandler("au", au_check))   # Gateway 1
-    app.add_handler(CommandHandler("ad", ad_check))   # Gateway 2 (အသစ်)
-    app.add_handler(CommandHandler("az", az_check))   # Gateway 3 (အသစ်)
-    app.add_handler(CommandHandler("ak", ak_check))   # Gateway 3 (အသစ်)
+    app.add_handler(CommandHandler("au", au_check))   
+    app.add_handler(CommandHandler("ad", ad_check))   
+    app.add_handler(CommandHandler("az", az_check))   
+    app.add_handler(CommandHandler("ak", ak_check))   
     app.add_handler(CommandHandler("add", add_credit))
     
-    print("Bot is running with Credit System & Dual Gateway...")
+    # Gateway Control Command (Admin Only)
+    app.add_handler(CommandHandler("gate", control_gate))
+    
+    print("Bot is running with Gate Control System...")
     app.run_polling()
