@@ -31,6 +31,16 @@ def init_db():
     cursor.execute('''CREATE TABLE IF NOT EXISTS gate_status (gate_name TEXT PRIMARY KEY, is_active INTEGER DEFAULT 1)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS card_history (user_id INTEGER, cc_number TEXT, check_count INTEGER DEFAULT 0, PRIMARY KEY (user_id, cc_number))''')
     
+    # ၂။ --- Database အဟောင်းထဲကို column အသစ်ပေါင်းထည့်တဲ့ အပိုင်း ---
+    try:
+        # last_check_time column မရှိသေးရင် ထည့်မယ်
+        cursor.execute("ALTER TABLE card_history ADD COLUMN last_check_time INTEGER DEFAULT 0")
+        conn.commit()
+        print("Successfully updated database: Added last_check_time column.")
+    except sqlite3.OperationalError:
+        # Column ရှိပြီးသားဆိုရင် error တက်မှာဖြစ်လို့ ဒီအတိုင်း ကျော်သွားမယ်
+        print("Column 'last_check_time' already exists. Skipping update.")
+    
     gates = [('au',), ('ad',), ('az',), ('ak',)]
     cursor.executemany('INSERT OR IGNORE INTO gate_status (gate_name) VALUES (?)', gates)
     conn.commit()
@@ -87,7 +97,7 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("⚠️ ကျေးဇူးပြု၍ အရင် /register လုပ်ပါ။")
 
-# --- Logic with Error-Safe Counter ---
+# --- Logic with Correct 24-Hour Reset ---
 async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE, gate_func, gate_name):
     if not is_gate_on(gate_name):
         await update.message.reply_text(f"❌ Gateway **{gate_name}** သည် လောလောဆယ် ပြုပြင်ထိန်းသိမ်းနေသောကြောင့် ခေတ္တပိတ်ထားပါသည်။")
@@ -113,35 +123,61 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
         conn.close()
         return
 
-    # ၂။ Duplicate Check (Check သာလုပ်မည်၊ Count ကို Error ကင်းမှ တိုးမည်)
-    cursor.execute("SELECT check_count FROM card_history WHERE user_id = ? AND cc_number = ?", (user_id, cc))
+    # ၂။ Duplicate Check Logic
+    current_time = int(time.time())
+    one_day_seconds = 24 * 60 * 60
+    
+    cursor.execute("SELECT check_count, last_check_time FROM card_history WHERE user_id = ? AND cc_number = ?", (user_id, cc))
     history = cursor.fetchone()
 
-    if history and history[0] >= 3:
-        await update.message.reply_text("❌ <b>Duplicate check founded!</b>\n\nဒီကတ်ကို ထပ်မံစစ်ဆေးခွင့်မပြုတော့ပါ။", parse_mode="HTML")
-        conn.close()
-        return
+    if history:
+        count, last_time = history
+        # ၂၄ နာရီ မပြည့်သေးရင် Count စစ်မယ်
+        if (current_time - last_time) < one_day_seconds:
+            if count >= 3:
+                remaining_time = one_day_seconds - (current_time - last_time)
+                hours_left = remaining_time // 3600
+                minutes_left = (remaining_time % 3600) // 60
+                await update.message.reply_text(
+                    f"❌ <b>Duplicate check founded!</b>\n\nဒီကတ်ကို ၂၄ နာရီအတွင်း ၃ ကြိမ်စစ်ပြီးသွားပါပြီ။ "
+                    f"နောက်ထပ် <b>{int(hours_left)} နာရီ {int(minutes_left)} မိနစ်</b> နေမှ ပြန်စစ်ပေးပါ။", 
+                    parse_mode="HTML"
+                )
+                conn.close()
+                return
+        else:
+            # ၂၄ နာရီ ကျော်သွားပြီဆိုရင် Count ကို Reset ချမယ်
+            cursor.execute("UPDATE card_history SET check_count = 0 WHERE user_id = ? AND cc_number = ?", (user_id, cc))
+            conn.commit()
 
-    msg = await update.message.reply_text(f"🔍 Procsessing your card...")
+    msg = await update.message.reply_text(f"🔍 Processing your card...")
     start_time = time.time()
 
     try:
-        # Gateway ကို စစ်ဆေးခိုင်းခြင်း
+        # Gateway ကို စစ်ဆေးခြင်း
         last = str(gate_func(cc))
         
-        # --- ဒီနေရာရောက်ပြီဆိုရင် Gateway Response ရပြီဖြစ်လို့ Count နဲ့ Credit ကို နှုတ်ပါမယ် ---
+        # --- ဒီအပိုင်းမှာ Database ကို Update လုပ်တာ သေချာအောင် ပြင်ထားပါတယ် ---
         
-        # (က) Count တိုးမြှင့်ခြင်း
+        # (က) Count နဲ့ အချိန်ကို သိမ်းဆည်းခြင်း
         if history:
-            cursor.execute("UPDATE card_history SET check_count = check_count + 1 WHERE user_id = ? AND cc_number = ?", (user_id, cc))
+            # ရှိပြီးသားဆိုရင် count ကို ၁ တိုးမယ်၊ အချိန်ကို အခုအချိန်ပြောင်းမယ်
+            cursor.execute(
+                "UPDATE card_history SET check_count = check_count + 1, last_check_time = ? WHERE user_id = ? AND cc_number = ?", 
+                (current_time, user_id, cc)
+            )
         else:
-            cursor.execute("INSERT INTO card_history (user_id, cc_number, check_count) VALUES (?, ?, 1)", (user_id, cc))
+            # အသစ်ဆိုရင် record အသစ်ဆောက်မယ်
+            cursor.execute(
+                "INSERT INTO card_history (user_id, cc_number, check_count, last_check_time) VALUES (?, ?, 1, ?)", 
+                (user_id, cc, current_time)
+            )
 
         # (ခ) Credit နှုတ်ခြင်း
         new_credits = user_data[0] - 1
         cursor.execute("UPDATE users SET credits = ? WHERE user_id = ?", (new_credits, user_id))
         
-        conn.commit() # Database မှာ သိမ်းလိုက်ပြီ
+        conn.commit() 
 
         # Result ပြသခြင်း
         if any(x in last.lower() for x in ["Successfully", "Thanks", "Thank", "thank", "success"]):
@@ -152,7 +188,6 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
         await msg.edit_text(send_response, parse_mode="HTML")
 
     except Exception as e:
-        # Gateway မှာ Error တက်သွားရင် Count လည်းမတိုးသလို Credit လည်းမနှုတ်ပါဘူး
         logging.error(f"Error: {e}")
         await msg.edit_text(f"❌ An error occurred: Try again.")
     
