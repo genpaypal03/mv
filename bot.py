@@ -15,7 +15,7 @@ except ImportError as e:
     print(f"Error: ဖိုင်တစ်ခုခု လိုအပ်နေသည် - {e}")
 
 # --- CONFIGURATION ---
-BOT_TOKEN = '7730132849:AAGxRopXYWDKsK0kshMu8BIU2LkznOVj6ug' 
+BOT_TOKEN = '' 
 ADMIN_ID = 7954343626              
 
 logging.basicConfig(
