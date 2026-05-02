@@ -41,7 +41,7 @@ def init_db():
         # Column ရှိပြီးသားဆိုရင် error တက်မှာဖြစ်လို့ ဒီအတိုင်း ကျော်သွားမယ်
         print("Column 'last_check_time' already exists. Skipping update.")
     
-    gates = [('au',), ('ad',), ('az',), ('ak',)]
+    gates = [('au',), ('ad',), ('az',), ('pp',)]
     cursor.executemany('INSERT OR IGNORE INTO gate_status (gate_name) VALUES (?)', gates)
     conn.commit()
     conn.close()
@@ -218,7 +218,7 @@ async def control_gate(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cursor.execute("UPDATE gate_status SET is_active = ? WHERE gate_name = ?", (status, gate_name))
         conn.commit(); conn.close()
         await update.message.reply_text(f"✅ Gateway {gate_name} {action}.")
-    except: await update.message.reply_text("Usage: /gate [au/ad/az/ak] [on/off]")
+    except: await update.message.reply_text("Usage: /gate [au/ad/az/pp] [on/off]")
 
 if __name__ == '__main__':
     init_db()
