@@ -65,10 +65,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "သုံးလို့ရတဲ့ Command များ -\n\n"
         "/register - အကောင့်ဖွင့်ပြီး Credit 10 ယူမယ်\n"
         "/balance - လက်ကျန် Credit စစ်မယ်\n"
-        "/au - Gateway 1 နဲ့စစ်မယ် (1 Credit)\n"
-        "/ad - Gateway 2 နဲ့စစ်မယ် (1 Credit)\n"
-        "/az - Gateway 3 နဲ့စစ်မယ် (1 Credit)\n"
-        "/ak - Gateway 4 နဲ့စစ်မယ် (1 Credit)\n\n"
+        "/au - Authorize 1 နဲ့စစ်မယ် (1 Credit)\n"
+        "/ad - Authorize 2 နဲ့စစ်မယ် (1 Credit)\n"
+        "/az - Authorize 3 နဲ့စစ်မယ် (1 Credit)\n"
+        "/pp - Paypal 1 နဲ့စစ်မယ် (1 Credit)\n\n"
         "ဆက်သွယ်ရန် - @strawhatchannel69"
     )
 
@@ -197,7 +197,7 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
 async def au_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele, "au")
 async def ad_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele1, "ad")
 async def az_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele2, "az")
-async def ak_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele3, "ak")
+async def pp_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele3, "pp")
 
 async def add_credit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID: return
@@ -229,7 +229,7 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("au", au_check))
     app.add_handler(CommandHandler("ad", ad_check))
     app.add_handler(CommandHandler("az", az_check))
-    app.add_handler(CommandHandler("ak", ak_check))
+    app.add_handler(CommandHandler("pp", pp_check))
     app.add_handler(CommandHandler("add", add_credit))
     app.add_handler(CommandHandler("gate", control_gate))
     print("Bot is running...")
