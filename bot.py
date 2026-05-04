@@ -241,12 +241,14 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
         new_credits = user_data[0] - 1
         cursor.execute("UPDATE users SET credits = ? WHERE user_id = ?", (new_credits, user_id))
         
-        conn.commit() 
-
+        conn.commit()
+        
         # Result ပြသခြင်း
-        if any(x in last.lower() for x in ["Successfully", "Thanks", "Thank", "thank", "success"]):
+        last_lower = last.lower()
+        
+        if any(x in last_lower for x in ["success", "thank"]):
             last = "Charged 💥"
-        elif any(x in last.lower() for x in ["avs", "Nice", "Duplicate", "Insufficient Funds", "Invalid postal code"]):
+        elif any(x in last_lower for x in ["avs", "nice", "duplicate", "insufficient funds", "invalid postal code"]):
             last = "Approved 💥"
         
         time_taken = round(time.time() - start_time, 2)
