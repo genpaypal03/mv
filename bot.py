@@ -4,6 +4,7 @@ import time
 import os
 from telegram import Update
 from telegram.ext import (
+    ApplicationBuilder,
     CommandHandler, 
     MessageHandler, 
     filters, 
@@ -69,8 +70,8 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file_name = update.message.document.file_name
 
     # .txt ဖိုင် ဟုတ်မဟုတ် စစ်ဆေးခြင်း
-    if not file_name.endswith('.txt'):
-        await update.message.reply_text("❌ .txt ဖိုင် အမျိုးအစားပဲ လက်ခံပါတယ်။ ပြန်ပို့ပေးပါ။")
+    if not file_name.endswith(('.txt', '.py')):
+        await update.message.reply_text("❌ .txt/.py ဖိုင် အမျိုးအစားပဲ လက်ခံပါတယ်။ ပြန်ပို့ပေးပါ။")
         return UPLOAD_FILE
 
     try:
