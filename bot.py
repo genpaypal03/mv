@@ -246,6 +246,8 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
         # Result ပြသခြင်း
         if any(x in last.lower() for x in ["Successfully", "Thanks", "Thank", "thank", "success"]):
             last = "Charged 💥"
+        elif any(x in last.lower() for x in ["avs", "Nice", "Duplicate", "Insufficient Funds", "Invalid postal code"]):
+            last = "Approved 💥"
         
         time_taken = round(time.time() - start_time, 2)
         send_response = send(cc, last, username, time_taken)
