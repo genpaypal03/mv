@@ -135,6 +135,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/br - Braintee auth နဲ့စစ်မယ် (1 Credit)\n\n"
         "ဆက်သွယ်ရန် - @strawhatchannel69"
     )
+    
+def is_chat_allowed(chat_id):
+    """group.txt ဖိုင်ထဲမှာ လက်ရှိ chat_id ပါသလား စစ်ဆေးခြင်း"""
+    filename = 'group.txt'
+    if not os.path.exists(filename):
+        return False
+    
+    try:
+        with open(filename, 'r') as f:
+            allowed_ids = [line.strip() for line in f.readlines() if line.strip()]
+        return str(chat_id) in allowed_ids
+    except Exception:
+        return False
+
+async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+    await update.message.reply_text(f"ဒီ Chat ရဲ့ ID ကတော့: `{chat_id}` ဖြစ်ပါတယ်", parse_mode="Markdown")
 
 async def register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -169,6 +186,8 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
     user_id = update.effective_user.id
     username = update.effective_user.username or "NoUsername"
+    current_chat_id = update.effective_chat.id
+    is_free_group = is_chat_allowed(current_chat_id)
     
     if not context.args:
         await update.message.reply_text("⚠️ Card format မမှန်ကန်ပါ။ ဥပမာ- `/au cc|mm|yy|cvc`", parse_mode="Markdown")
@@ -179,13 +198,15 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
     cursor = conn.cursor()
 
     # ၁။ User & Credit စစ်ဆေးခြင်း
-    cursor.execute("SELECT credits FROM users WHERE user_id = ?", (user_id,))
-    user_data = cursor.fetchone()
+    user_data = None
+    if not is_free_group:
+        cursor.execute("SELECT credits FROM users WHERE user_id = ?", (user_id,))
+        user_data = cursor.fetchone()
     
-    if not user_data or user_data[0] <= 0:
-        await update.message.reply_text("❌ သင့်မှာ Credit မလုံလောက်တော့ပါ။" if user_data else "⚠️ ကျေးဇူးပြု၍ အရင် /register လုပ်ပါ။")
-        conn.close()
-        return
+        if not user_data or user_data[0] <= 0:
+            await update.message.reply_text("❌ သင့်မှာ Credit မလုံလောက်တော့ပါ။" if user_data else "⚠️ ကျေးဇူးပြု၍ အရင် /register လုပ်ပါ။")
+            conn.close()
+            return
 
     # ၂။ Duplicate Check Logic
     current_time = int(time.time())
@@ -238,8 +259,9 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
             )
 
         # (ခ) Credit နှုတ်ခြင်း
-        new_credits = user_data[0] - 1
-        cursor.execute("UPDATE users SET credits = ? WHERE user_id = ?", (new_credits, user_id))
+        if not is_free_group and user_data:
+            new_credits = user_data[0] - 1
+            cursor.execute("UPDATE users SET credits = ? WHERE user_id = ?", (new_credits, user_id))
         
         conn.commit()
         
@@ -300,6 +322,7 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("br", br_check))
     app.add_handler(CommandHandler("add", add_credit))
     app.add_handler(CommandHandler("gate", control_gate))
+    app.add_handler(CommandHandler("id", get_id))
     app.add_handler(CommandHandler("rmtxt", remove_file))
     add_txt_handler = ConversationHandler(
         entry_points=[CommandHandler('addtxt', start_addtxt)],
