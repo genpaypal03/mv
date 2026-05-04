@@ -1,8 +1,16 @@
 import sqlite3
 import logging
 import time
+import os
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler, 
+    MessageHandler, 
+    filters, 
+    ConversationHandler, 
+    ContextTypes
+)
 
 # --- အရေးကြီးသွင်းကုန်များ ---
 try:
@@ -23,6 +31,62 @@ logging.basicConfig(
     level=logging.INFO
 )
 
+# Conversation State
+UPLOAD_FILE = 1
+
+# --- ၁။ ဖိုင်ဖျက်သည့် Command (/rmtxt filename) ---
+async def remove_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    if not context.args:
+        await update.message.reply_text("⚠️ သုံးစွဲပုံ- `/rmtxt proxy.txt`", parse_mode="Markdown")
+        return
+
+    filename = context.args[0]
+    try:
+        if os.path.exists(filename):
+            os.remove(filename)
+            await update.message.reply_text(f"✅ ဖိုင် **{filename}** ကို ဖျက်လိုက်ပါပြီ။", parse_mode="Markdown")
+        else:
+            await update.message.reply_text(f"❌ ဖိုင် **{filename}** ကို ရှာမတွေ့ပါ။", parse_mode="Markdown")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {str(e)}")
+
+# --- ၂။ ဖိုင်အသစ်တင်သည့် Command (/addtxt) ---
+async def start_addtxt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
+    
+    await update.message.reply_text(
+        "📁 ကျေးဇူးပြု၍ သင် Upload တင်လိုသော **.txt** ဖိုင်ကို ပို့ပေးပါ။\n\n"
+        "(မတင်လိုတော့ပါက /cancel ဟု ရိုက်ပါ)", 
+        parse_mode="Markdown"
+    )
+    return UPLOAD_FILE
+
+async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    file = await update.message.document.get_file()
+    file_name = update.message.document.file_name
+
+    # .txt ဖိုင် ဟုတ်မဟုတ် စစ်ဆေးခြင်း
+    if not file_name.endswith(('.txt', '.py')):
+        await update.message.reply_text("❌ .txt/.py ဖိုင် အမျိုးအစားပဲ လက်ခံပါတယ်။ ပြန်ပို့ပေးပါ။")
+        return UPLOAD_FILE
+
+    try:
+        # VPS ပေါ်တွင် ဖိုင်နာမည်အတိုင်း သိမ်းဆည်းခြင်း
+        await file.download_to_drive(file_name)
+        await update.message.reply_text(f"✅ ဖိုင် **{file_name}** ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။", parse_mode="Markdown")
+    except Exception as e:
+        await update.message.reply_text(f"❌ သိမ်းဆည်းရာတွင် အမှားအယွင်းရှိပါသည်- {e}")
+    
+    return ConversationHandler.END
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("❌ လုပ်ဆောင်ချက်ကို ဖျက်သိမ်းလိုက်ပါပြီ။")
+    return ConversationHandler.END
+
 # --- DATABASE SETUP ---
 def init_db():
     conn = sqlite3.connect('bot_database.db')
@@ -41,7 +105,7 @@ def init_db():
         # Column ရှိပြီးသားဆိုရင် error တက်မှာဖြစ်လို့ ဒီအတိုင်း ကျော်သွားမယ်
         print("Column 'last_check_time' already exists. Skipping update.")
     
-    gates = [('au',), ('ad',), ('az',), ('pp',)]
+    gates = [('au',), ('ad',), ('az',), ('br',)]
     cursor.executemany('INSERT OR IGNORE INTO gate_status (gate_name) VALUES (?)', gates)
     conn.commit()
     conn.close()
@@ -68,7 +132,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/au - Authorize 1 နဲ့စစ်မယ် (1 Credit)\n"
         "/ad - Authorize 2 နဲ့စစ်မယ် (1 Credit)\n"
         "/az - Authorize 3 နဲ့စစ်မယ် (1 Credit)\n"
-        "/pp - Paypal 1 နဲ့စစ်မယ် (1 Credit)\n\n"
+        "/br - Braintee auth နဲ့စစ်မယ် (1 Credit)\n\n"
         "ဆက်သွယ်ရန် - @strawhatchannel69"
     )
 
@@ -177,11 +241,15 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
         new_credits = user_data[0] - 1
         cursor.execute("UPDATE users SET credits = ? WHERE user_id = ?", (new_credits, user_id))
         
-        conn.commit() 
-
+        conn.commit()
+        
         # Result ပြသခြင်း
-        if any(x in last.lower() for x in ["Successfully", "Thanks", "Thank", "thank", "success"]):
+        last_lower = last.lower()
+        
+        if any(x in last_lower for x in ["success", "thank"]):
             last = "Charged 💥"
+        elif any(x in last_lower for x in ["avs", "nice", "duplicate", "insufficient funds", "invalid postal code"]):
+            last = "Approved 💥"
         
         time_taken = round(time.time() - start_time, 2)
         send_response = send(cc, last, username, time_taken)
@@ -197,7 +265,7 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
 async def au_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele, "au")
 async def ad_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele1, "ad")
 async def az_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele2, "az")
-async def pp_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele3, "pp")
+async def br_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele3, "br")
 
 async def add_credit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID: return
@@ -218,7 +286,7 @@ async def control_gate(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cursor.execute("UPDATE gate_status SET is_active = ? WHERE gate_name = ?", (status, gate_name))
         conn.commit(); conn.close()
         await update.message.reply_text(f"✅ Gateway {gate_name} {action}.")
-    except: await update.message.reply_text("Usage: /gate [au/ad/az/pp] [on/off]")
+    except: await update.message.reply_text("Usage: /gate [au/ad/az/br] [on/off]")
 
 if __name__ == '__main__':
     init_db()
@@ -229,8 +297,17 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("au", au_check))
     app.add_handler(CommandHandler("ad", ad_check))
     app.add_handler(CommandHandler("az", az_check))
-    app.add_handler(CommandHandler("pp", pp_check))
+    app.add_handler(CommandHandler("br", br_check))
     app.add_handler(CommandHandler("add", add_credit))
     app.add_handler(CommandHandler("gate", control_gate))
+    app.add_handler(CommandHandler("rmtxt", remove_file))
+    add_txt_handler = ConversationHandler(
+        entry_points=[CommandHandler('addtxt', start_addtxt)],
+        states={
+            UPLOAD_FILE: [MessageHandler(filters.Document.ALL, handle_document)],
+        },
+        fallbacks=[CommandHandler('cancel', cancel)],
+    )
+    app.add_handler(add_txt_handler)
     print("Bot is running...")
     app.run_polling()
