@@ -105,7 +105,7 @@ def init_db():
         # Column ရှိပြီးသားဆိုရင် error တက်မှာဖြစ်လို့ ဒီအတိုင်း ကျော်သွားမယ်
         print("Column 'last_check_time' already exists. Skipping update.")
     
-    gates = [('au',), ('ad',), ('az',), ('br',)]
+    gates = [('au',), ('ad',), ('az',)]
     cursor.executemany('INSERT OR IGNORE INTO gate_status (gate_name) VALUES (?)', gates)
     conn.commit()
     conn.close()
@@ -132,7 +132,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/au - Authorize 1 နဲ့စစ်မယ် (1 Credit)\n"
         "/ad - Authorize 2 နဲ့စစ်မယ် (1 Credit)\n"
         "/az - Authorize 3 နဲ့စစ်မယ် (1 Credit)\n"
-        "/br - Braintee auth နဲ့စစ်မယ် (1 Credit)\n\n"
+        "/sa - Stripe auth နဲ့စစ်မယ် (Free)\n\n"
         "ဆက်သွယ်ရန် - @strawhatchannel69"
     )
     
@@ -199,7 +199,7 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
     # ၁။ User & Credit စစ်ဆေးခြင်း
     user_data = None
-    if not is_free_group:
+    if not is_free_group and gate_name != "sa":
         cursor.execute("SELECT credits FROM users WHERE user_id = ?", (user_id,))
         user_data = cursor.fetchone()
     
@@ -259,7 +259,7 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
             )
 
         # (ခ) Credit နှုတ်ခြင်း
-        if not is_free_group and user_data:
+        if not is_free_group and user_data and gate_name != "sa":
             new_credits = user_data[0] - 1
             cursor.execute("UPDATE users SET credits = ? WHERE user_id = ?", (new_credits, user_id))
         
@@ -270,7 +270,7 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
         
         if any(x in last_lower for x in ["success", "thank"]):
             last = "Charged 💥"
-        elif any(x in last_lower for x in ["avs", "nice", "duplicate", "insufficient funds", "invalid postal code"]):
+        elif any(x in last_lower for x in ["avs", "nice", "duplicate", "insufficient funds", "invalid postal code", "true"]):
             last = "Approved 💥"
         
         time_taken = round(time.time() - start_time, 2)
@@ -287,7 +287,7 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
 async def au_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele, "au")
 async def ad_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele1, "ad")
 async def az_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele2, "az")
-async def br_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele3, "br")
+async def sa_check(update: Update, context: ContextTypes.DEFAULT_TYPE): await process_card_check(update, context, Tele3, "sa")
 
 async def add_credit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID: return
@@ -308,7 +308,7 @@ async def control_gate(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cursor.execute("UPDATE gate_status SET is_active = ? WHERE gate_name = ?", (status, gate_name))
         conn.commit(); conn.close()
         await update.message.reply_text(f"✅ Gateway {gate_name} {action}.")
-    except: await update.message.reply_text("Usage: /gate [au/ad/az/br] [on/off]")
+    except: await update.message.reply_text("Usage: /gate [au/ad/az/sa] [on/off]")
 
 if __name__ == '__main__':
     init_db()
@@ -319,7 +319,7 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("au", au_check))
     app.add_handler(CommandHandler("ad", ad_check))
     app.add_handler(CommandHandler("az", az_check))
-    app.add_handler(CommandHandler("br", br_check))
+    app.add_handler(CommandHandler("sa", sa_check))
     app.add_handler(CommandHandler("add", add_credit))
     app.add_handler(CommandHandler("gate", control_gate))
     app.add_handler(CommandHandler("id", get_id))
