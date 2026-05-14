@@ -105,7 +105,7 @@ def init_db():
         # Column ရှိပြီးသားဆိုရင် error တက်မှာဖြစ်လို့ ဒီအတိုင်း ကျော်သွားမယ်
         print("Column 'last_check_time' already exists. Skipping update.")
     
-    gates = [('au',), ('ad',), ('az',)]
+    gates = [('au',), ('ad',), ('az',), ('sa',)]
     cursor.executemany('INSERT OR IGNORE INTO gate_status (gate_name) VALUES (?)', gates)
     conn.commit()
     conn.close()
@@ -268,10 +268,12 @@ async def process_card_check(update: Update, context: ContextTypes.DEFAULT_TYPE,
         # Result ပြသခြင်း
         last_lower = last.lower()
         
-        if any(x in last_lower for x in ["success", "thank"]):
+        if any(x in last_lower for x in ["successfully", "thank", "confirmation"]):
             last = "Charged 💥"
-        elif any(x in last_lower for x in ["avs", "nice", "duplicate", "insufficient funds", "invalid postal code", "true"]):
+        elif any(x in last_lower for x in ["avs", "nice", "duplicate", "insufficient funds", "invalid postal code", "succeeded"]):
             last = "Approved 💥"
+        elif any(x in last_lower for x in ["D4451"]):
+            last = "Insufficient Funds"
         
         time_taken = round(time.time() - start_time, 2)
         send_response = send(cc, last, username, time_taken)
